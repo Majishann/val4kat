@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Will You Be My Valentine?</title>
+  <!-- Google Font for a cute handwritten style -->
+  <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet" />
+  <!-- Canvas Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+  <style>
+    /* Global Styles with Background Transition */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Indie Flower', cursive;
+      background: linear-gradient(135deg, #fbc2eb, #a6c1ee);
+      animation: gradientBackground 20s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    @keyframes gradientBackground {
+      0% { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+      50% { background: linear-gradient(135deg, #a6c1ee, #fbc2eb); }
+      100% { background: linear-gradient(135deg, #fbc2eb, #a6c1ee); }
+    }
+    
+    /* Petals (Falling Petals) */
+    .petals {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .petal {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: fallPetal linear forwards;
+    }
+    
+    @keyframes fallPetal {
+      0% {
+        transform: translateY(-10%) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+    
+    /* Main Container with Glowing Effect */
+    .container {
+      background-color: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15), 0 0 20px rgba(255,111,97,0.4);
+      max-width: 400px;
+      text-align: center;
+      position: relative;
+      z-index: 5;
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    h1 {
+      color: #ff6f61;
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    /* Heartbeat effect next to the title */
+    .heartbeat {
+      display: inline-block;
+      color: #ff6f61;
+      animation: heartbeat 1.5s infinite;
+    }
+    
+    @keyframes heartbeat {
+      0% { transform: scale(1); }
+      25% { transform: scale(1.2); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+    
+    p {
+      color: #555;
+      font-size: 1.3rem;
+      margin-bottom: 20px;
+    }
+    
+    /* Countdown Timer */
+    #countdown {
+      font-size: 1.1rem;
+      color: #ff6f61;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+    
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+    
+    button {
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+      position: relative;
+    }
+    
+    button:active {
+      transform: scale(0.95);
+    }
+    
+    #yesButton {
+      background-color: #ff6f61;
+      color: #fff;
+    }
+    
+    #yesButton:hover {
+      background-color: #ff4a3d;
+    }
+    
+    #noButton {
+      background-color: #ddd;
+      color: #555;
+    }
+    
+    #noButton:hover {
+      background-color: #ccc;
+    }
+    
+    #responseMessage {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      color: #ff6f61;
+      font-weight: bold;
+    }
+    
+    /* Clouds Animation */
+    .clouds {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 1000px;
+      opacity: 0.85;
+      animation: moveClouds linear infinite;
+    }
+    
+    @keyframes moveClouds {
+      0% { transform: translateX(-150%); }
+      100% { transform: translateX(100vw); }
+    }
+    
+    /* Hearts Animation */
+    .hearts {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 2;
+    }
+    
+    .heart {
+      position: absolute;
+      color: #ff6f61;
+      font-size: 1.5rem;
+      opacity: 0.8;
+      animation: floatHearts linear infinite;
+    }
+    
+    @keyframes floatHearts {
+      0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0;
+      }
+      50% { opacity: 1; }
+      100% {
+        transform: translateY(-10vh) scale(1);
+        opacity: 0;
+      }
+    }
+    
+    /* Cats Animation (Random Appearance and Fade-Out) */
+    .cats {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 4;
+    }
+    
+    .cat {
+      position: absolute;
+      width: 80px;
+      animation: fadeCat 5s linear forwards;
+    }
+    
+    @keyframes fadeCat {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    /* Love Letter Modal */
+    #loveLetterModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 10;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #loveLetterContent {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      text-align: center;
+      font-size: 1.2rem;
+      color: #333;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    #closeModal {
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff6f61;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    /* Secret Modal (Easter Egg) */
+    #secretModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 11;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    #secretContent {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+      font-size: 1.1rem;
+      color: #333;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    #closeSecret {
+      margin-top: 15px;
+      padding: 8px 16px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #ff6f61;
+      color: #fff;
+      cursor: pointer;
+    }
+    
+    /* Cursor Effect: Little hearts following the mouse */
+    .cursor-heart {
+      position: absolute;
+      pointer-events: none;
+      font-size: 1.2rem;
+      color: #ff6f61;
+      animation: fadeCursorHeart 1s ease-out forwards;
+    }
+    
+    @keyframes fadeCursorHeart {
+      0% { opacity: 1; transform: translate(0, 0) scale(1); }
+      100% { opacity: 0; transform: translate(0, -20px) scale(1.5); }
+    }
+  </style>
+</head>
+<body>
+  <!-- Petals Container (Falling Petals) -->
+  <div class="petals"></div>
+  <!-- Floating Hearts Background -->
+  <div class="hearts"></div>
+  <!-- Moving Clouds Background -->
+  <div class="clouds"></div>
+  <!-- Cats Container (Will start spawning after Yes is clicked) -->
+  <div class="cats"></div>
+  <!-- Love Letter Modal -->
+  <div id="loveLetterModal">
+    <div id="loveLetterContent">
+      <h2>My Love Letter</h2>
+      <p>
+        Dear Kat,<br><br>
+        You're the spark that lights my way,<br>
+        The brightest part of every day.<br>
+        Your laughter sings, your smile shines,<br>
+        I’m so lucky that you’re mine.<br><br>
+        With all my heart,<br>Your Secret Admirer
+      </p>
+      <button id="closeModal">Close</button>
+    </div>
+  </div>
+  <!-- Secret Modal (Easter Egg) -->
+  <div id="secretModal">
+    <div id="secretContent">
+      <h2>Secret Message</h2>
+      <p>You are truly wonderful, and every day with you is a gift. I love you so much!</p>
+      <button id="closeSecret">Close</button>
+    </div>
+  </div>
+  <!-- Main Content Container -->
+  <div class="container">
+    <h1>Will You Be My Valentine? <span class="heartbeat">❤</span></h1>
+    <p>Hey there! I was wondering if you'd like to be my Valentine this year. 💖</p>
+    <!-- Countdown Timer -->
+    <div id="countdown"></div>
+    <div class="buttons">
+      <button id="yesButton">Yes!</button>
+      <button id="noButton">No</button>
+    </div>
+    <p id="responseMessage"></p>
+  </div>
+  
+  <script>
+    // --- Petals ---
+    const petalsContainer = document.querySelector('.petals');
+    function spawnPetal() {
+      const petal = document.createElement('div');
+      petal.classList.add('petal');
+      petal.textContent = "🌸";
+      petal.style.left = Math.random() * 100 + '%';
+      petal.style.fontSize = (Math.random() * 1 + 1.5) + 'rem';
+      const duration = Math.random() * 4 + 8; // Duration between 8 and 12 seconds
+      petal.style.animationDuration = duration + 's';
+      petalsContainer.appendChild(petal);
+      petal.addEventListener('animationend', () => petal.remove());
+    }
+    // Spawn one petal every 1000ms (1 second)
+    setInterval(spawnPetal, 1000);
+    
+    // --- Clouds ---
+    const cloudsContainer = document.querySelector('.clouds');
+    const numberOfClouds = 10;
+    for (let i = 0; i < numberOfClouds; i++) {
+      const cloud = document.createElement('div');
+      cloud.classList.add('cloud');
+      const width = Math.floor(Math.random() * 150) + 100;
+      cloud.style.width = width + 'px';
+      cloud.style.height = Math.floor(width / 3) + 'px';
+      cloud.style.top = Math.floor(Math.random() * 100) + '%';
+      cloud.style.left = -width + 'px';
+      const duration = Math.floor(Math.random() * 20) + 20;
+      cloud.style.animationDuration = duration + 's';
+      const delay = Math.random() * 3;
+      cloud.style.animationDelay = delay + 's';
+      cloudsContainer.appendChild(cloud);
+    }
+    
+    // --- Floating Hearts ---
+    const heartsContainer = document.querySelector('.hearts');
+    const numberOfHearts = 15;
+    for (let i = 0; i < numberOfHearts; i++) {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = '❤';
+      heart.style.left = Math.random() * 100 + '%';
+      const fontSize = Math.random() * 1 + 1.5;
+      heart.style.fontSize = fontSize + 'rem';
+      const duration = Math.floor(Math.random() * 7) + 8;
+      heart.style.animationDuration = duration + 's';
+      const delay = Math.random() * 5;
+      heart.style.animationDelay = delay + 's';
+      heartsContainer.appendChild(heart);
+    }
+    
+    // --- Countdown Timer ---
+    function updateCountdown() {
+      const now = new Date();
+      let currentYear = now.getFullYear();
+      let valentineDate = new Date(currentYear, 1, 14); // February 14 of current year
+      if (now > valentineDate) {
+        valentineDate = new Date(currentYear + 1, 1, 14);
+      }
+      const distance = valentineDate - now;
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById("countdown").innerHTML =
+        "Countdown to Valentine's Day: " + days + "d " + hours + "h " + minutes + "m " + seconds + "s";
+    }
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+    
+    // --- Cursor Effect: Little Hearts Following the Mouse ---
+    let lastCursorTime = 0;
+    document.addEventListener('mousemove', function(e) {
+      const now = Date.now();
+      if (now - lastCursorTime > 100) { // Throttle: one heart every 100ms
+        lastCursorTime = now;
+        const cursorHeart = document.createElement('span');
+        cursorHeart.className = 'cursor-heart';
+        cursorHeart.innerText = '❤';
+        cursorHeart.style.left = (e.pageX - 10) + 'px';
+        cursorHeart.style.top = (e.pageY - 10) + 'px';
+        document.body.appendChild(cursorHeart);
+        cursorHeart.addEventListener('animationend', () => cursorHeart.remove());
+      }
+    });
+    
+    // --- No Button Behavior ---
+    const noButton = document.getElementById('noButton');
+    noButton.addEventListener('mouseenter', function () {
+      const offsetX = Math.floor(Math.random() * 800) - 400;
+      const offsetY = Math.floor(Math.random() * 400) - 200;
+      noButton.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+    });
+    const noMessages = ["Are you sure?", "Try Again", "😡😡😡"];
+    let noMessageIndex = 0;
+    noButton.addEventListener('click', function () {
+      document.getElementById('responseMessage').textContent = noMessages[noMessageIndex];
+      noMessageIndex = (noMessageIndex + 1) % noMessages.length;
+    });
+    
+    // --- Cats: They Will Spawn Only After "Yes" is Clicked ---
+    const catsContainer = document.querySelector('.cats');
+    let catsInterval;
+    function spawnCat() {
+      const cat = document.createElement('img');
+      cat.src = "https://media.tenor.com/DpJdyKQKgYkAAAAj/cat-jump.gif";
+      cat.classList.add('cat');
+      cat.style.left = Math.random() * 100 + '%';
+      cat.style.top = Math.random() * 100 + '%';
+      const duration = Math.random() * 2 + 4; // Duration between 4 and 6 seconds
+      cat.style.animationDuration = duration + 's';
+      catsContainer.appendChild(cat);
+      cat.addEventListener('animationend', () => cat.remove());
+    }
+    
+    // --- Yes Button: Trigger Confetti, Show Love Letter Modal, and Start Cats Spawning ---
+    const yesButton = document.getElementById('yesButton');
+    yesButton.addEventListener('click', function () {
+      document.getElementById('responseMessage').textContent = "Yay! I'm so happy! 💖";
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 }
+      });
+      // Show the love letter modal after a short delay
+      setTimeout(() => {
+        document.getElementById('loveLetterModal').style.display = 'flex';
+      }, 1000);
+      // Start spawning cats continuously if not already started
+      if (!catsInterval) {
+        catsInterval = setInterval(() => {
+          for (let i = 0; i < 10; i++) {
+            spawnCat();
+          }
+        }, 3000);
+      }
+    });
+    
+    // --- Love Letter Modal Close ---
+    document.getElementById('closeModal').addEventListener('click', function () {
+      document.getElementById('loveLetterModal').style.display = 'none';
+    });
+    
+    // --- Secret Modal (Easter Egg) ---
+    // When the user double-clicks anywhere on the document, show the secret modal.
+    document.addEventListener('dblclick', function () {
+      document.getElementById('secretModal').style.display = 'flex';
+    });
+    
+    // --- Secret Modal Close ---
+    document.getElementById('closeSecret').addEventListener('click', function () {
+      document.getElementById('secretModal').style.display = 'none';
+    });
+  </script>
+</body>
+</html>
